@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=https://www.isoloom.com/schema/v1.json
+# Games Irados (secDevLabs, by Globo.com) as an Isoloom spec: a Flask game shop whose login and
+# coupon forms can be brute forced unnoticed, a Security Logging and Monitoring Failure.
+# Vendored unchanged in build/app/app/ (the app folder owasp-top10-2021-apps/a9/games-irados of
+# secDevLabs), built by an overlay of upstream's Dockerfile, and its MariaDB machine.
+# `isoloom generate`, then `isoloom run docker`.
+version: 1
+name: secdevlabs-games-irados
+
+networks:
+  lab: { cidr: 10.60.109.0/24, internet: false }
+
+machines:
+  mysqldb-a10:
+    networks: { lab: 20 }
+    services: [{ port: 3306, name: mariadb }]
+    resources: { cpus: 1, memory_mb: 512 }
+    volumes: { data: /var/lib/mysql }
+    docker:
+      build: build/mysqldb-a10
+
+  app:
+    networks: { lab: 10 }
+    services: [{ port: 10010, name: web, http: true, publish: 10010 }]
+    resources: { cpus: 1, memory_mb: 512 }
+    depends_on: [mysqldb-a10]
+    docker:
+      build: build/app
+
+checks:
+  - name: the login page answers
+    http: http://app:10010/login
+    wait: 180
+  - name: a player signs up, logs in and tries a coupon
+    script: checks/coupon.sh
+    wait: 60
+
+message: |
+  Games Irados answers at http://localhost:{{ machines.app.services.0.publish }}/. Register,
+  log in and redeem a coupon: how many guesses does the shop allow, and who notices them?
