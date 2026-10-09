@@ -4,11 +4,5 @@
   "question": "Brute force the coupon form to redeem a valid coupon and win a game.",
   "category": "WEB",
   "difficulty": 1,
-  "evidence_kind": "SECRET",
-  "capabilities": [
-    "logging-monitoring-failure",
-    "brute-force",
-    "coupon-guessing",
-    "missing-rate-limit"
-  ]
+  "evidence_kind": "SECRET"
 }
