@@ -1,0 +1,41 @@
+{
+  "objectives": [
+    {
+      "key": "main",
+      "title": "Read the flag",
+      "prompt": "Brute force a valid coupon: the game it unlocks is the flag.",
+      "check": {
+        "evidence": "SECRET",
+        "format": "FLAG{%s}"
+      },
+      "dev": "FLAG{dev-secdevlabs-games-irados}",
+      "hints": [
+        "Nothing limits or logs coupon attempts.",
+        "Read about brute force and missing rate limiting."
+      ],
+      "steps": [
+        {
+          "key": "length",
+          "title": "Find the format",
+          "prompt": "How many characters does a coupon have?",
+          "check": {
+            "answer_regex": "^\\s*(5|five)\\s*$"
+          }
+        },
+        {
+          "key": "missing",
+          "title": "Name the gap",
+          "prompt": "Which control is missing in front of the coupon form?",
+          "check": {
+            "answer": [
+              "rate limiting",
+              "rate limit",
+              "lockout",
+              "logging and monitoring"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

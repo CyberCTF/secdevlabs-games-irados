@@ -3,7 +3,9 @@
   "resolved_version": 1,
   "name": "secdevlabs-games-irados",
   "instance": null,
-  "inputs": [],
+  "inputs": [
+    "CTF_FLAG_MAIN"
+  ],
   "networks": {
     "lab": {
       "cidr": "10.60.109.0/24",
@@ -81,7 +83,9 @@
       "depends_on": [
         "mysqldb-a10"
       ],
-      "inputs": [],
+      "inputs": [
+        "CTF_FLAG_MAIN"
+      ],
       "volumes": {},
       "resources": {
         "cpus": 1,

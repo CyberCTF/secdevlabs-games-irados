@@ -80,6 +80,8 @@ services:
     networks:
       lab:
         ipv4_address: 10.60.109.10
+    environment:
+      CTF_FLAG_MAIN: ${CTF_FLAG_MAIN:-}
     ports:
     - ${ISOLOOM_PUBLISH_ADDRESS:-127.0.0.1}:${ISOLOOM_PUBLISH_FIXED:+10010}:10010
     healthcheck:
@@ -135,6 +137,25 @@ services:
     labels:
       isoloom.managed: 'true'
       isoloom.environment: secdevlabs-games-irados
+  app-init-1:
+    image: isoloom/secdevlabs-games-irados-app
+    entrypoint:
+    - /bin/sh
+    - /isoloom/init/flag.sh
+    volumes:
+    - ../../ctf/flag.sh:/isoloom/init/flag.sh:ro
+    network_mode: service:app
+    environment:
+      CTF_FLAG_MAIN: ${CTF_FLAG_MAIN:-}
+    depends_on:
+      app:
+        condition: service_healthy
+      app-routes:
+        condition: service_healthy
+    restart: no
+    labels:
+      isoloom.managed: 'true'
+      isoloom.environment: secdevlabs-games-irados
   isoloom-check:
     image: curlimages/curl:8.11.1
     profiles:
@@ -158,6 +179,8 @@ services:
         condition: service_healthy
       app:
         condition: service_healthy
+      app-init-1:
+        condition: service_completed_successfully
       app-routes:
         condition: service_healthy
     labels:
@@ -180,6 +203,8 @@ services:
         condition: service_healthy
       app:
         condition: service_healthy
+      app-init-1:
+        condition: service_completed_successfully
       app-routes:
         condition: service_healthy
     labels:
@@ -202,6 +227,8 @@ services:
         condition: service_healthy
       app:
         condition: service_healthy
+      app-init-1:
+        condition: service_completed_successfully
       app-routes:
         condition: service_healthy
     labels:
