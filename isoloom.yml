@@ -8,29 +8,38 @@ version: 1
 name: secdevlabs-games-irados
 
 # Given by the CyberCTF launcher: this player's flag. Without it the development flag.
-inputs: [CTF_FLAG_MAIN]
+inputs:
+  CTF_FLAG_MAIN: {}
 
 networks:
-  lab: { cidr: 10.60.109.0/24, internet: false }
+  lab: {cidr: 10.60.109.0/24, internet: false}
 
 machines:
   mysqldb-a10:
-    networks: { lab: 20 }
-    services: [{ port: 3306, name: mariadb }]
-    resources: { cpus: 1, memory_mb: 512 }
-    volumes: { data: /var/lib/mysql }
-    docker:
+    networks: {lab: 20}
+    resources: {cpus: 1, memory_mb: 512}
+    volumes: {data: /var/lib/mysql}
+    ports:
+      mariadb:
+        port: 3306
+    app:
       build: build/mysqldb-a10
-
   app:
-    networks: { lab: 10 }
-    services: [{ port: 10010, name: web, http: true, publish: 10010 }]
-    resources: { cpus: 1, memory_mb: 512 }
+    networks: {lab: 10}
+    resources: {cpus: 1, memory_mb: 512}
     depends_on: [mysqldb-a10]
-    inputs: [CTF_FLAG_MAIN]
-    docker:
+    ports:
+      web:
+        port: 10010
+        protocol: http
+        publish: true
+    files:
+      - path: /run/lab/ctf_flag_main
+        input: CTF_FLAG_MAIN
+    setup:
+      - ctf/flag.sh
+    app:
       build: build/app
-      init: [ctf/flag.sh]
 
 checks:
   - name: the login page answers
@@ -41,5 +50,5 @@ checks:
     wait: 60
 
 message: |
-  Games Irados answers at http://localhost:{{ machines.app.services.0.publish }}/. Register,
+  Games Irados answers at {{ machines.app.ports.web.url }}. Register,
   log in and redeem a coupon: how many guesses does the shop allow, and who notices them?
